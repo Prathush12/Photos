@@ -8,8 +8,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Represents a photo in the application.
- * A photo has a file path, caption, date taken, and a set of tags.
+ * Photo class. Stores info about a photo - where it's located on disk, 
+ * its caption, when it was taken (from file modification date), and tags.
  * 
  * @author Photos Team
  */
@@ -22,10 +22,10 @@ public class Photo implements Serializable {
     private Set<Tag> tags;
     
     /**
-     * Constructs a new Photo with the specified file path.
-     * The date taken is set to the file's last modification time.
+     * Creates a new photo from a file path. Gets the date from the file's 
+     * last modified time since we can't read EXIF data.
      * 
-     * @param filePath the path to the photo file
+     * @param filePath path to the image file
      */
     public Photo(String filePath) {
         this.filePath = filePath;
@@ -35,7 +35,7 @@ public class Photo implements Serializable {
     }
     
     /**
-     * Updates the date taken from the file's last modification time.
+     * Updates the date by reading the file's last modified time.
      */
     public void updateDateFromFile() {
         File file = new File(filePath);
@@ -51,18 +51,14 @@ public class Photo implements Serializable {
     }
     
     /**
-     * Gets the file path of the photo.
-     * 
-     * @return the file path
+     * Returns the file path.
      */
     public String getFilePath() {
         return filePath;
     }
     
     /**
-     * Sets the file path of the photo.
-     * 
-     * @param filePath the file path to set
+     * Sets a new file path and updates the date.
      */
     public void setFilePath(String filePath) {
         this.filePath = filePath;
@@ -70,66 +66,49 @@ public class Photo implements Serializable {
     }
     
     /**
-     * Gets the caption of the photo.
-     * 
-     * @return the caption
+     * Returns the caption.
      */
     public String getCaption() {
         return caption;
     }
     
     /**
-     * Sets the caption of the photo.
-     * 
-     * @param caption the caption to set
+     * Sets the caption.
      */
     public void setCaption(String caption) {
         this.caption = caption;
     }
     
     /**
-     * Gets the date the photo was taken.
-     * 
-     * @return the date taken
+     * Returns when the photo was taken (from file mod date).
      */
     public LocalDateTime getDateTaken() {
         return dateTaken;
     }
     
     /**
-     * Gets all tags associated with this photo.
-     * 
-     * @return a set of tags
+     * Returns all tags for this photo.
      */
     public Set<Tag> getTags() {
         return tags;
     }
     
     /**
-     * Adds a tag to this photo.
-     * 
-     * @param tag the tag to add
-     * @return true if the tag was added, false if it already exists
+     * Adds a tag. Returns false if the tag already exists.
      */
     public boolean addTag(Tag tag) {
         return tags.add(tag);
     }
     
     /**
-     * Removes a tag from this photo.
-     * 
-     * @param tag the tag to remove
-     * @return true if the tag was removed, false if it didn't exist
+     * Removes a tag. Returns false if it wasn't there.
      */
     public boolean removeTag(Tag tag) {
         return tags.remove(tag);
     }
     
     /**
-     * Checks if this photo has a specific tag.
-     * 
-     * @param tag the tag to check for
-     * @return true if the photo has this tag
+     * Checks if the photo has a specific tag.
      */
     public boolean hasTag(Tag tag) {
         return tags.contains(tag);

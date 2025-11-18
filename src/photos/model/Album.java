@@ -6,8 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Represents an album containing photos.
- * An album has a name and a list of photos.
+ * Album class. Just a collection of photos with a name. Can calculate 
+ * date ranges and photo counts for display.
  * 
  * @author Photos Team
  */
@@ -18,9 +18,7 @@ public class Album implements Serializable {
     private List<Photo> photos;
     
     /**
-     * Constructs a new Album with the specified name.
-     * 
-     * @param name the name of the album
+     * Creates a new album with a name.
      */
     public Album(String name) {
         this.name = name;
@@ -28,37 +26,28 @@ public class Album implements Serializable {
     }
     
     /**
-     * Gets the name of the album.
-     * 
-     * @return the album name
+     * Returns the album name.
      */
     public String getName() {
         return name;
     }
     
     /**
-     * Sets the name of the album.
-     * 
-     * @param name the album name to set
+     * Sets the album name.
      */
     public void setName(String name) {
         this.name = name;
     }
     
     /**
-     * Gets all photos in this album.
-     * 
-     * @return a list of photos
+     * Returns all photos in the album.
      */
     public List<Photo> getPhotos() {
         return photos;
     }
     
     /**
-     * Adds a photo to this album.
-     * 
-     * @param photo the photo to add
-     * @return true if the photo was added, false if it already exists in the album
+     * Adds a photo. Returns false if it's already in the album.
      */
     public boolean addPhoto(Photo photo) {
         if (photos.contains(photo)) {
@@ -68,28 +57,21 @@ public class Album implements Serializable {
     }
     
     /**
-     * Removes a photo from this album.
-     * 
-     * @param photo the photo to remove
-     * @return true if the photo was removed, false if it didn't exist
+     * Removes a photo from the album.
      */
     public boolean removePhoto(Photo photo) {
         return photos.remove(photo);
     }
     
     /**
-     * Gets the number of photos in this album.
-     * 
-     * @return the number of photos
+     * Returns how many photos are in the album.
      */
     public int getPhotoCount() {
         return photos.size();
     }
     
     /**
-     * Gets the earliest date of photos in this album.
-     * 
-     * @return the earliest date, or null if the album is empty
+     * Finds the earliest date from all photos. Returns null if empty.
      */
     public LocalDateTime getEarliestDate() {
         if (photos.isEmpty()) {
@@ -105,9 +87,7 @@ public class Album implements Serializable {
     }
     
     /**
-     * Gets the latest date of photos in this album.
-     * 
-     * @return the latest date, or null if the album is empty
+     * Finds the latest date from all photos. Returns null if empty.
      */
     public LocalDateTime getLatestDate() {
         if (photos.isEmpty()) {
