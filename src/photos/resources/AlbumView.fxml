@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.GridPane?>
+
+<BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="photos.controller.AlbumViewController">
+   <top>
+      <Label fx:id="albumNameLabel" text="Album" style="-fx-font-size: 20px; -fx-font-weight: bold;" BorderPane.alignment="CENTER">
+         <padding>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+         </padding>
+      </Label>
+   </top>
+   <center>
+      <VBox spacing="10" xmlns="http://javafx.com/javafx/11.0.1">
+         <padding>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+         </padding>
+         <children>
+            <Label text="Photos:" />
+            <ListView fx:id="photosListView" VBox.vgrow="ALWAYS" />
+            <HBox spacing="10">
+               <Button text="Add Photo" onAction="#handleAddPhoto" />
+               <Button text="Remove Photo" onAction="#handleRemovePhoto" />
+               <Button text="View Photo" onAction="#handleViewPhoto" />
+               <Button text="Caption Photo" onAction="#handleCaptionPhoto" />
+               <Button text="Add Tag" onAction="#handleAddTag" />
+               <Button text="Delete Tag" onAction="#handleDeleteTag" />
+            </HBox>
+            <HBox spacing="10">
+               <Button text="Copy Photo" onAction="#handleCopyPhoto" />
+               <Button text="Move Photo" onAction="#handleMovePhoto" />
+               <Button text="Previous" onAction="#handlePrevious" />
+               <Button text="Next" onAction="#handleNext" />
+            </HBox>
+         </children>
+      </VBox>
+   </center>
+   <bottom>
+      <HBox spacing="10" alignment="CENTER" BorderPane.alignment="CENTER">
+         <padding>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+         </padding>
+         <Button text="Back to Albums" onAction="#handleBack" />
+      </HBox>
+   </bottom>
+</BorderPane>
+
