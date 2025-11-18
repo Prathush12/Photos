@@ -132,10 +132,8 @@ public class PhotoApp implements java.io.Serializable {
         try (ObjectInputStream ois = new ObjectInputStream(
                 new FileInputStream(USERS_FILE))) {
             PhotoApp app = (PhotoApp) ois.readObject();
-            // Ensure stock user exists
-            if (!app.userExists("stock")) {
-                app.initializeStockUser();
-            }
+            // Always refresh stock user to load any new photos
+            app.initializeStockUser();
             return app;
         } catch (IOException | ClassNotFoundException e) {
             // If loading fails, create a new app with stock user
@@ -152,19 +150,27 @@ public class PhotoApp implements java.io.Serializable {
         User stockUser = new User("stock", "stock");
         Album stockAlbum = new Album("stock");
         
-        File stockDir = new File(DATA_DIR);
-        if (stockDir.exists() && stockDir.isDirectory()) {
-            File[] files = stockDir.listFiles((dir, name) -> {
-                String lower = name.toLowerCase();
-                return lower.endsWith(".jpg") || lower.endsWith(".jpeg") || 
-                       lower.endsWith(".png") || lower.endsWith(".gif") || 
-                       lower.endsWith(".bmp");
-            });
-            
-            if (files != null) {
-                for (File file : files) {
-                    Photo photo = new Photo(file.getAbsolutePath());
-                    stockAlbum.addPhoto(photo);
+        // First try data/stock/ subdirectory, then fall back to data/ directory
+        File[] searchDirs = {
+            new File(DATA_DIR + File.separator + "stock"),
+            new File(DATA_DIR)
+        };
+        
+        for (File searchDir : searchDirs) {
+            if (searchDir.exists() && searchDir.isDirectory()) {
+                File[] files = searchDir.listFiles((dir, name) -> {
+                    String lower = name.toLowerCase();
+                    return lower.endsWith(".jpg") || lower.endsWith(".jpeg") || 
+                           lower.endsWith(".png") || lower.endsWith(".gif") || 
+                           lower.endsWith(".bmp");
+                });
+                
+                if (files != null && files.length > 0) {
+                    for (File file : files) {
+                        Photo photo = new Photo(file.getAbsolutePath());
+                        stockAlbum.addPhoto(photo);
+                    }
+                    break; // Found photos, no need to check other directories
                 }
             }
         }
