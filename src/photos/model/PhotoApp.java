@@ -12,8 +12,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Main application model that manages users and data persistence.
- * Handles serialization and deserialization of user data.
+ * Main app class. Keeps track of all users and handles saving/loading 
+ * everything to disk using Java serialization. Also manages tag types.
  * 
  * @author Photos Team
  */
@@ -27,8 +27,7 @@ public class PhotoApp implements java.io.Serializable {
     private List<String> tagTypes;
     
     /**
-     * Constructs a new PhotoApp instance.
-     * Initializes the users map and default tag types.
+     * Creates a new PhotoApp and sets up default tag types.
      */
     public PhotoApp() {
         this.users = new HashMap<>();
@@ -37,7 +36,7 @@ public class PhotoApp implements java.io.Serializable {
     }
     
     /**
-     * Initializes default tag types.
+     * Sets up the default tag types (location and person).
      */
     private void initializeDefaultTagTypes() {
         tagTypes.add("location");
@@ -45,29 +44,21 @@ public class PhotoApp implements java.io.Serializable {
     }
     
     /**
-     * Gets all users.
-     * 
-     * @return a list of all users
+     * Returns all users.
      */
     public List<User> getUsers() {
         return new ArrayList<>(users.values());
     }
     
     /**
-     * Gets a user by username.
-     * 
-     * @param username the username
-     * @return the user if found, null otherwise
+     * Gets a user by username. Returns null if not found.
      */
     public User getUser(String username) {
         return users.get(username);
     }
     
     /**
-     * Adds a new user.
-     * 
-     * @param user the user to add
-     * @return true if the user was added, false if a user with the same username already exists
+     * Adds a new user. Returns false if username already exists.
      */
     public boolean addUser(User user) {
         if (users.containsKey(user.getUsername())) {
@@ -78,10 +69,7 @@ public class PhotoApp implements java.io.Serializable {
     }
     
     /**
-     * Removes a user.
-     * 
-     * @param username the username of the user to remove
-     * @return true if the user was removed, false if the user didn't exist
+     * Removes a user. Can't delete stock or admin.
      */
     public boolean removeUser(String username) {
         if (username.equals("stock") || username.equals("admin")) {
@@ -92,28 +80,20 @@ public class PhotoApp implements java.io.Serializable {
     
     /**
      * Checks if a user exists.
-     * 
-     * @param username the username to check
-     * @return true if the user exists
      */
     public boolean userExists(String username) {
         return users.containsKey(username);
     }
     
     /**
-     * Gets all tag types.
-     * 
-     * @return a list of tag type names
+     * Returns all available tag types.
      */
     public List<String> getTagTypes() {
         return new ArrayList<>(tagTypes);
     }
     
     /**
-     * Adds a new tag type.
-     * 
-     * @param tagType the tag type to add
-     * @return true if the tag type was added, false if it already exists
+     * Adds a new tag type. Returns false if it already exists.
      */
     public boolean addTagType(String tagType) {
         if (tagTypes.contains(tagType)) {
@@ -123,9 +103,7 @@ public class PhotoApp implements java.io.Serializable {
     }
     
     /**
-     * Saves the application data to disk.
-     * 
-     * @throws IOException if an I/O error occurs
+     * Saves all user data to disk.
      */
     public void save() throws IOException {
         File dataDir = new File(DATA_DIR);
@@ -140,9 +118,8 @@ public class PhotoApp implements java.io.Serializable {
     }
     
     /**
-     * Loads the application data from disk.
-     * 
-     * @return the loaded PhotoApp instance, or a new instance if no data exists
+     * Loads all user data from disk. Creates a new app with stock user if 
+     * nothing exists yet.
      */
     public static PhotoApp load() {
         File usersFile = new File(USERS_FILE);
@@ -169,7 +146,7 @@ public class PhotoApp implements java.io.Serializable {
     }
     
     /**
-     * Initializes the stock user with stock photos.
+     * Sets up the stock user and loads any photos from the data directory.
      */
     private void initializeStockUser() {
         User stockUser = new User("stock", "stock");

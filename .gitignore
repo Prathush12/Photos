@@ -1,0 +1,21 @@
+# Compiled classes
+out/
+*.class
+
+# Data files - exclude user data but include stock photos
+data/users.dat
+
+# Javadoc (can be regenerated)
+docs/
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+.DS_Store
+
+# Build artifacts
+*.jar
+*.war
+
+

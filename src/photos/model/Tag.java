@@ -3,8 +3,8 @@ package photos.model;
 import java.io.Serializable;
 
 /**
- * Represents a tag that can be associated with a photo.
- * A tag consists of a name and a value pair.
+ * Tag class for photos. Basically just a name-value pair like "location"="Paris" 
+ * or "person"="Alice". Used to organize and search photos.
  * 
  * @author Photos Team
  */
@@ -15,10 +15,10 @@ public class Tag implements Serializable {
     private String value;
     
     /**
-     * Constructs a new Tag with the specified name and value.
+     * Creates a new tag with a name and value.
      * 
-     * @param name the tag name (e.g., "location", "person")
-     * @param value the tag value (e.g., "New Brunswick", "susan")
+     * @param name like "location" or "person"
+     * @param value like "Paris" or "Alice"
      */
     public Tag(String name, String value) {
         this.name = name;
@@ -44,9 +44,7 @@ public class Tag implements Serializable {
     }
     
     /**
-     * Gets the tag value.
-     * 
-     * @return the tag value
+     * Returns the tag value.
      */
     public String getValue() {
         return value;
@@ -54,8 +52,6 @@ public class Tag implements Serializable {
     
     /**
      * Sets the tag value.
-     * 
-     * @param value the tag value to set
      */
     public void setValue(String value) {
         this.value = value;
