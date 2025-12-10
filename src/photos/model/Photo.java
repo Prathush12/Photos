@@ -51,14 +51,18 @@ public class Photo implements Serializable {
     }
     
     /**
-     * Returns the file path.
+     * Returns the file path of the photo.
+     * 
+     * @return the file path as a string
      */
     public String getFilePath() {
         return filePath;
     }
     
     /**
-     * Sets a new file path and updates the date.
+     * Sets a new file path and updates the date from the file.
+     * 
+     * @param filePath the new file path
      */
     public void setFilePath(String filePath) {
         this.filePath = filePath;
@@ -66,21 +70,27 @@ public class Photo implements Serializable {
     }
     
     /**
-     * Returns the caption.
+     * Returns the caption of the photo.
+     * 
+     * @return the caption, or empty string if no caption is set
      */
     public String getCaption() {
         return caption;
     }
     
     /**
-     * Sets the caption.
+     * Sets the caption for the photo.
+     * 
+     * @param caption the caption to set
      */
     public void setCaption(String caption) {
         this.caption = caption;
     }
     
     /**
-     * Returns when the photo was taken (from file mod date).
+     * Returns when the photo was taken (from file modification date).
+     * 
+     * @return the date and time the photo was taken
      */
     public LocalDateTime getDateTaken() {
         return dateTaken;
@@ -88,20 +98,28 @@ public class Photo implements Serializable {
     
     /**
      * Returns all tags for this photo.
+     * 
+     * @return a set of all tags associated with this photo
      */
     public Set<Tag> getTags() {
         return tags;
     }
     
     /**
-     * Adds a tag. Returns false if the tag already exists.
+     * Adds a tag to the photo. Returns false if the tag already exists.
+     * 
+     * @param tag the tag to add
+     * @return true if the tag was added, false if it already exists
      */
     public boolean addTag(Tag tag) {
         return tags.add(tag);
     }
     
     /**
-     * Removes a tag. Returns false if it wasn't there.
+     * Removes a tag from the photo. Returns false if the tag wasn't present.
+     * 
+     * @param tag the tag to remove
+     * @return true if the tag was removed, false if it wasn't present
      */
     public boolean removeTag(Tag tag) {
         return tags.remove(tag);
@@ -109,6 +127,9 @@ public class Photo implements Serializable {
     
     /**
      * Checks if the photo has a specific tag.
+     * 
+     * @param tag the tag to check for
+     * @return true if the photo has this tag, false otherwise
      */
     public boolean hasTag(Tag tag) {
         return tags.contains(tag);

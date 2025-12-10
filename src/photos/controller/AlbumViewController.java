@@ -1,15 +1,17 @@
 package photos.controller;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
 import javafx.scene.control.TextInputDialog;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.TilePane;
+import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import photos.model.Album;
@@ -34,14 +36,14 @@ public class AlbumViewController {
     @FXML
     private Label albumNameLabel;
     @FXML
-    private ListView<String> photosListView;
+    private TilePane photosTilePane;
     
     private PhotoApp photoApp;
     private User user;
     private Album album;
     private Stage primaryStage;
-    private ObservableList<String> photosList;
-    private int currentPhotoIndex = -1;
+    private List<Photo> photosList;
+    private Photo selectedPhoto;
     
     /**
      * Sets the PhotoApp instance.
@@ -85,26 +87,73 @@ public class AlbumViewController {
      */
     @FXML
     private void initialize() {
-        photosList = FXCollections.observableArrayList();
-        photosListView.setItems(photosList);
-        photosListView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal != null) {
-                currentPhotoIndex = photosList.indexOf(newVal);
-            }
-        });
+        photosList = new ArrayList<>();
     }
     
     /**
-     * Refreshes the photos list display.
+     * Refreshes the photos list display with thumbnails.
      */
     public void refreshPhotos() {
+        photosTilePane.getChildren().clear();
         photosList.clear();
-        for (Photo photo : album.getPhotos()) {
-            String display = photo.getCaption().isEmpty() ? 
-                new File(photo.getFilePath()).getName() : 
-                photo.getCaption();
-            photosList.add(display);
+        photosList.addAll(album.getPhotos());
+        
+        for (Photo photo : photosList) {
+            VBox photoBox = createPhotoThumbnail(photo);
+            photosTilePane.getChildren().add(photoBox);
         }
+    }
+    
+    /**
+     * Creates a thumbnail view for a photo.
+     * 
+     * @param photo the photo to create a thumbnail for
+     * @return a VBox containing the thumbnail image and caption
+     */
+    private VBox createPhotoThumbnail(Photo photo) {
+        VBox box = new VBox(5);
+        box.setStyle("-fx-border-color: gray; -fx-border-width: 1; -fx-padding: 5;");
+        
+        ImageView imageView = new ImageView();
+        imageView.setFitWidth(150);
+        imageView.setFitHeight(150);
+        imageView.setPreserveRatio(true);
+        imageView.setSmooth(true);
+        
+        File file = new File(photo.getFilePath());
+        if (file.exists()) {
+            Image image = new Image(file.toURI().toString(), 150, 150, true, true);
+            imageView.setImage(image);
+        }
+        
+        Label captionLabel = new Label();
+        String caption = photo.getCaption();
+        if (caption.isEmpty()) {
+            caption = new File(photo.getFilePath()).getName();
+        }
+        if (caption.length() > 20) {
+            caption = caption.substring(0, 17) + "...";
+        }
+        captionLabel.setText(caption);
+        captionLabel.setMaxWidth(150);
+        captionLabel.setWrapText(true);
+        
+        box.getChildren().addAll(imageView, captionLabel);
+        
+        // Make it clickable to select
+        box.setOnMouseClicked((MouseEvent e) -> {
+            // Remove previous selection styling
+            photosTilePane.getChildren().forEach(node -> {
+                if (node instanceof VBox) {
+                    node.setStyle("-fx-border-color: gray; -fx-border-width: 1; -fx-padding: 5;");
+                }
+            });
+            // Add selection styling
+            box.setStyle("-fx-border-color: blue; -fx-border-width: 2; -fx-padding: 5;");
+            selectedPhoto = photo;
+        });
+        
+        return box;
     }
     
     /**
@@ -113,11 +162,7 @@ public class AlbumViewController {
      * @return the selected photo, or null if none selected
      */
     private Photo getSelectedPhoto() {
-        int index = photosListView.getSelectionModel().getSelectedIndex();
-        if (index >= 0 && index < album.getPhotos().size()) {
-            return album.getPhotos().get(index);
-        }
-        return null;
+        return selectedPhoto;
     }
     
     /**
@@ -159,8 +204,8 @@ public class AlbumViewController {
         }
         
         album.removePhoto(photo);
+        selectedPhoto = null;
         refreshPhotos();
-        currentPhotoIndex = -1;
         showAlert(Alert.AlertType.INFORMATION, "Success", "Photo removed successfully.");
     }
     
@@ -181,6 +226,8 @@ public class AlbumViewController {
             Scene scene = new Scene(loader.load());
             PhotoDisplayController controller = loader.getController();
             controller.setPhoto(photo);
+            controller.setAlbum(album);
+            controller.setPhotoIndex(album.getPhotos().indexOf(photo));
             controller.setPrimaryStage(primaryStage);
             controller.setPreviousScene(currentScene);
             controller.displayPhoto();
@@ -397,54 +444,14 @@ public class AlbumViewController {
             if (destAlbum != null) {
                 if (destAlbum.addPhoto(photo)) {
                     album.removePhoto(photo);
+                    selectedPhoto = null;
                     refreshPhotos();
-                    currentPhotoIndex = -1;
                     showAlert(Alert.AlertType.INFORMATION, "Success", "Photo moved successfully.");
                 } else {
                     showAlert(Alert.AlertType.ERROR, "Error", "Photo already exists in that album.");
                 }
             }
         }
-    }
-    
-    /**
-     * Handles the previous photo button action.
-     */
-    @FXML
-    private void handlePrevious() {
-        if (album.getPhotos().isEmpty()) {
-            showAlert(Alert.AlertType.ERROR, "Error", "Album is empty.");
-            return;
-        }
-        
-        if (currentPhotoIndex < 0) {
-            currentPhotoIndex = album.getPhotos().size() - 1;
-        } else {
-            currentPhotoIndex = (currentPhotoIndex - 1 + album.getPhotos().size()) % album.getPhotos().size();
-        }
-        
-        photosListView.getSelectionModel().select(currentPhotoIndex);
-        handleViewPhoto();
-    }
-    
-    /**
-     * Handles the next photo button action.
-     */
-    @FXML
-    private void handleNext() {
-        if (album.getPhotos().isEmpty()) {
-            showAlert(Alert.AlertType.ERROR, "Error", "Album is empty.");
-            return;
-        }
-        
-        if (currentPhotoIndex < 0) {
-            currentPhotoIndex = 0;
-        } else {
-            currentPhotoIndex = (currentPhotoIndex + 1) % album.getPhotos().size();
-        }
-        
-        photosListView.getSelectionModel().select(currentPhotoIndex);
-        handleViewPhoto();
     }
     
     /**

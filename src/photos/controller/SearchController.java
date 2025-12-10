@@ -1,19 +1,20 @@
 package photos.controller;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import photos.model.Album;
@@ -26,7 +27,6 @@ import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,12 +56,11 @@ public class SearchController {
     @FXML
     private RadioButton orRadio;
     @FXML
-    private ListView<String> resultsListView;
+    private TilePane resultsTilePane;
     
     private PhotoApp photoApp;
     private User user;
     private Stage primaryStage;
-    private ObservableList<String> resultsList;
     private List<Photo> searchResults;
     
     /**
@@ -101,8 +100,6 @@ public class SearchController {
      */
     @FXML
     private void initialize() {
-        resultsList = FXCollections.observableArrayList();
-        resultsListView.setItems(resultsList);
         searchResults = new ArrayList<>();
         
         // Toggle visibility based on search type
@@ -129,7 +126,7 @@ public class SearchController {
         }
         
         searchResults.clear();
-        resultsList.clear();
+        resultsTilePane.getChildren().clear();
         
         if (selected.getText().contains("Date")) {
             searchByDateRange();
@@ -137,12 +134,15 @@ public class SearchController {
             searchByTags();
         }
         
-        // Display results
-        for (Photo photo : searchResults) {
-            String display = photo.getCaption().isEmpty() ? 
-                new File(photo.getFilePath()).getName() : 
-                photo.getCaption();
-            resultsList.add(display);
+        // Display results as thumbnails
+        if (searchResults.isEmpty()) {
+            showAlert(Alert.AlertType.INFORMATION, "Search Results", "No photos found matching the criteria.");
+        } else {
+            for (Photo photo : searchResults) {
+                VBox photoBox = createPhotoThumbnail(photo);
+                resultsTilePane.getChildren().add(photoBox);
+            }
+            showAlert(Alert.AlertType.INFORMATION, "Search Results", "Found " + searchResults.size() + " photo(s).");
         }
     }
     
@@ -271,6 +271,64 @@ public class SearchController {
         } catch (IOException e) {
             showAlert(Alert.AlertType.ERROR, "Error", "Failed to load albums screen.");
         }
+    }
+    
+    /**
+     * Creates a thumbnail view for a photo in search results.
+     * 
+     * @param photo the photo to create a thumbnail for
+     * @return a VBox containing the thumbnail image and caption
+     */
+    private VBox createPhotoThumbnail(Photo photo) {
+        VBox box = new VBox(5);
+        box.setStyle("-fx-border-color: gray; -fx-border-width: 1; -fx-padding: 5;");
+        
+        ImageView imageView = new ImageView();
+        imageView.setFitWidth(150);
+        imageView.setFitHeight(150);
+        imageView.setPreserveRatio(true);
+        imageView.setSmooth(true);
+        
+        File file = new File(photo.getFilePath());
+        if (file.exists()) {
+            Image image = new Image(file.toURI().toString(), 150, 150, true, true);
+            imageView.setImage(image);
+        }
+        
+        Label captionLabel = new Label();
+        String caption = photo.getCaption();
+        if (caption.isEmpty()) {
+            caption = new File(photo.getFilePath()).getName();
+        }
+        if (caption.length() > 20) {
+            caption = caption.substring(0, 17) + "...";
+        }
+        captionLabel.setText(caption);
+        captionLabel.setMaxWidth(150);
+        captionLabel.setWrapText(true);
+        
+        box.getChildren().addAll(imageView, captionLabel);
+        
+        // Make it clickable to view
+        box.setOnMouseClicked((MouseEvent e) -> {
+            try {
+                Scene currentScene = primaryStage.getScene();
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/photos/resources/PhotoDisplay.fxml"));
+                Scene scene = new Scene(loader.load());
+                photos.controller.PhotoDisplayController controller = loader.getController();
+                controller.setPhoto(photo);
+                controller.setPrimaryStage(primaryStage);
+                controller.setPreviousScene(currentScene);
+                controller.displayPhoto();
+                primaryStage.setScene(scene);
+                primaryStage.setTitle("Photo: " + (photo.getCaption().isEmpty() ? 
+                    new File(photo.getFilePath()).getName() : photo.getCaption()));
+            } catch (IOException ex) {
+                showAlert(Alert.AlertType.ERROR, "Error", "Failed to load photo display.");
+            }
+        });
+        
+        return box;
     }
     
     /**

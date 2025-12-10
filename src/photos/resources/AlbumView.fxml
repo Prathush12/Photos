@@ -3,11 +3,11 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.TilePane?>
 
 <BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="photos.controller.AlbumViewController">
    <top>
@@ -24,7 +24,9 @@
          </padding>
          <children>
             <Label text="Photos:" />
-            <ListView fx:id="photosListView" VBox.vgrow="ALWAYS" />
+            <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS">
+               <TilePane fx:id="photosTilePane" hgap="10" vgap="10" prefColumns="4" />
+            </ScrollPane>
             <HBox spacing="10">
                <Button text="Add Photo" onAction="#handleAddPhoto" />
                <Button text="Remove Photo" onAction="#handleRemovePhoto" />
@@ -36,8 +38,6 @@
             <HBox spacing="10">
                <Button text="Copy Photo" onAction="#handleCopyPhoto" />
                <Button text="Move Photo" onAction="#handleMovePhoto" />
-               <Button text="Previous" onAction="#handlePrevious" />
-               <Button text="Next" onAction="#handleNext" />
             </HBox>
          </children>
       </VBox>
